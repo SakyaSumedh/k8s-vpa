@@ -8,11 +8,10 @@ import uvicorn
 LARGE_LIST: list[int] | None = None
 
 
-def memory_usage() -> tuple[float, float]:
+def memory_usage() -> float:
     process = psutil.Process(os.getpid())
     memory = process.memory_info().rss / 1024 / 1024  # Convert bytes to MB
-    cpu = process.cpu_percent(interval=1)
-    return cpu, memory
+    return memory
 
 
 class Consumer(BaseModel):
@@ -24,9 +23,8 @@ app = FastAPI()
 
 @app.get("/")
 async def memory_usage_metrics():
-    cpu_utilization, memory_utilization = memory_usage()
+    memory_utilization = memory_usage()
     return {
-        "cpu_utilization": f"{cpu_utilization} %",
         "memory_utilization": f"{memory_utilization} MB"
     }
 

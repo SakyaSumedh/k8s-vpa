@@ -1,0 +1,23 @@
+{{- if .Values.autoscaling.vpa.enabled }}
+apiVersion: "autoscaling.k8s.io/v1"
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ include "deploy.fullname" . }}
+  labels:
+    {{- include "deploy.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: {{ include "deploy.fullname" . }}
+  updatePolicy:
+    updateMode: "Auto"  # "Off"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "*"
+      minAllowed:
+        {{- toYaml .Values.autoscaling.vpa.minAllowed | nindent 8 }}
+      maxAllowed:
+        {{- toYaml .Values.autoscaling.vpa.maxAllowed | nindent 8 }}
+      controlledResources: ["cpu", "memory"]
+{{- end }}
